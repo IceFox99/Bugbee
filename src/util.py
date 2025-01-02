@@ -91,12 +91,12 @@ def to_json(obj):
         obj_ref = {}
         if jsonp(temp_obj) != 'null':
             obj_ref = json.loads(jsonp(temp_obj))
-        obj_ref = obj_ref | {'$SourceCode$': get_code(temp_obj)} \
-                | (vars(temp_obj) if hasattr(temp_obj, '__dict__') else {})
+        obj_ref = obj_ref or {'$SourceCode$': get_code(temp_obj)} \
+                or (vars(temp_obj) if hasattr(temp_obj, '__dict__') else {})
         obj_json = json.dumps(obj_ref)
     else:
         if hasattr(temp_obj, '__dict__'):
-            obj_ref = json.loads(jsonp(temp_obj)) | vars(temp_obj)
+            obj_ref = json.loads(jsonp(temp_obj)) or vars(temp_obj)
             obj_json = json.dumps(obj_ref)
         else:
             obj_json = jsonp(temp_obj)
