@@ -63,3 +63,19 @@ def func1():
 
 
 print(to_json(func1))
+
+def is_even(n):
+    if n == 0:
+        return True
+    else:
+        return is_odd(n - 1)
+
+
+def is_odd(n):
+    if n == 0:
+        return False
+    else:
+        return is_even(n - 1)
+
+
+print(to_json(is_odd))
