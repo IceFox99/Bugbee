@@ -30,7 +30,7 @@ return return_val
         return block_ast.body
 
     def visit_FunctionDef(self, node):
-        func_id = f"{self.curr_file_path}@line{node.lineno}/Func@node.name"
+        func_id = f"{self.curr_file_path}@line{node.lineno}/Func@{node.name}"
 
         # Visit its subtree first
         self.generic_visit(node)
@@ -45,7 +45,7 @@ return return_val
         return node
 
     def visit_AsyncFunctionDef(self, node):
-        func_id = f"{self.curr_file_path}@line{node.lineno}/Func@node.name"
+        func_id = f"{self.curr_file_path}@line{node.lineno}/Func@{node.name}"
 
         # Visit its subtree first
         self.generic_visit(node)
