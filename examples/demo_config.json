@@ -1,0 +1,18 @@
+{
+	"src-proj-path": "Desktop/Bugfox-example",
+	"result-path": "Desktop/Bugfox-result",
+	"base-ignore": [
+		"node_modules"
+	],
+	"buggy-ignore": [
+		"node_modules"
+	],
+	"base-commit": "HEAD~",
+	"buggy-commit": "HEAD",
+	"base-commands": [
+		"node_modules/.bin/_mocha test/math.js"
+	],
+	"buggy-commands": [
+		"node_modules/.bin/_mocha test/math.js"
+	]
+}
