@@ -79,9 +79,6 @@ def remove_circ(obj, visited = None):
 
 
 def to_json(obj):
-    if obj == None:
-        return None
-
     temp_obj = obj
     jsonp = lambda obj: jsonpickle.encode(obj, make_refs=False)
     
@@ -96,13 +93,15 @@ def to_json(obj):
             obj_ref = json.loads(jsonp(temp_obj))
         obj_ref = obj_ref | {'$SourceCode$': get_code(temp_obj)} \
                 | (vars(temp_obj) if hasattr(temp_obj, '__dict__') else {})
-        obj_json = json.dumps(obj_ref)
+        #obj_json = json.dumps(obj_ref)
     else:
         if hasattr(temp_obj, '__dict__'):
             obj_ref = json.loads(jsonp(temp_obj)) \
                     | json.loads(to_json(vars(temp_obj)))
-            obj_json = json.dumps(obj_ref)
+            #obj_json = json.dumps(obj_ref)
         else:
-            obj_json = jsonp(temp_obj)
+            obj_ref = json.loads(jsonp(temp_obj))
+            #obj_json = jsonp(temp_obj)
 
-    return obj_json
+    # Instead of outputing json, output a deepcopyed jsonable object
+    return obj_ref

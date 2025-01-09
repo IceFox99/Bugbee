@@ -50,10 +50,12 @@ class FuncID:
 class FuncStack:
     def __init__(self, func_id_str, caller_func_stack=None, \
             pre_run_args=None, post_run_args=None, return_val=None):
-        if func_id_str != "ENTRY_POINT":
-            self.func_id = FuncID.parse(func_id_str)
-        else:
+        if caller_func_stack == None:
+            # ENTRY POINT
             self.func_id = func_id_str
+        else:
+            # Parse the complete function ID string to a FuncID object
+            self.func_id = FuncID.parse(func_id_str)
         self.pre_run_args = pre_run_args
         self.post_run_args = post_run_args
         self.return_val = return_val
@@ -70,7 +72,7 @@ class FuncStack:
 class FuncStackEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, FuncStack):
-                        return {
+            return {
                     "index": obj.index,
                     "func_id": obj.func_id,
                     "pre_run_args": obj.pre_run_args,
