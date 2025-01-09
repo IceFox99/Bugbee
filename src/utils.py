@@ -79,6 +79,9 @@ def remove_circ(obj, visited = None):
 
 
 def to_json(obj):
+    if obj == None:
+        return None
+
     temp_obj = obj
     jsonp = lambda obj: jsonpickle.encode(obj, make_refs=False)
     
