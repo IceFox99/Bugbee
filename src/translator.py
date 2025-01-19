@@ -5,6 +5,7 @@ import black
 import os, sys
 import hashlib
 
+
 class Translator(ast.NodeTransformer):
     def __init__(self, config):
         super().__init__()
@@ -136,9 +137,27 @@ return return_val
         tree = ast.parse(src_code)
         modified_tree = self.visit(tree)
         self.add_header(modified_tree)
-        modified_code = black.format_str(ast.unparse(modified_tree), \
-                mode=black.FileMode())
+        modified_code = black.format_str(ast.unparse(modified_tree), mode=black.FileMode())
 
         # TODO
-        with open("/home/username/new-Bugbee-example/test_math.py", "w") as f:
+        with open(file_path, "w") as f:
             f.write(modified_code)
+
+    def translate_folder(self, folder_path):
+        ignored_folders = ['.git', 'env']
+        files = os.listdir(folder_path)
+        for file in files:
+            file_path = os.path.join(folder_path, file)
+            if not file_path == os.path.join(folder_path, 'env'):
+                if os.path.isdir(file_path):
+                    self.translate_folder(file_path)
+                else:
+                    split_tup = os.path.splitext(file_path)
+                    if split_tup[1] == '.py':
+                        print(file_path)
+                        self.translate(file_path)
+
+
+if __name__ == "__main__":
+    t = Translator("")
+    t.translate_folder("/Users/eduardo/Desktop/youtube-dl")
