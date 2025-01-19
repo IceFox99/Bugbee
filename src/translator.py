@@ -20,7 +20,11 @@ sys.path.append(\"{include_path}\")
 from bugbeeinclude import Bugbee_build, Bugbee_complete 
         """
         header_ast = ast.parse(header_code)
-        module_node.body[:0] = header_ast.body
+        # from __future__ imports must occur at the beginning of the file
+        if isinstance(module_node.body[0], ast.Import) or isinstance(module_node.body[0], ast.ImportFrom):
+            module_node.body = module_node.body[0:1] + header_ast.body + module_node.body[1:]
+        else:
+            module_node.body[:0] = header_ast.body
 
     def generate_code_block(self, node, func_id):
         block_code = """
@@ -123,8 +127,7 @@ return return_val
 
         # Transform the lambda AST
         bugbee_lambda = ast.parse(f"Bugbee_execLambda(\"{func_id}\")").body[0].value
-        bugbee_lambda.args.append(ast.parse(copy.deepcopy(\
-                node.body)))
+        bugbee_lambda.args.append(ast.parse(copy.deepcopy(node.body)))
         node.body = bugbee_lambda
         return node
 

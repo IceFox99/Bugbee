@@ -97,7 +97,8 @@ def to_json(obj):
     else:
         if hasattr(temp_obj, '__dict__'):
             obj_ref = json.loads(jsonp(temp_obj)) \
-                    | json.loads(to_json(vars(temp_obj)))
+                    | to_json(vars(temp_obj))
+            # to_json returns a json object, and json.loads cannot load this json object
             #obj_json = json.dumps(obj_ref)
         else:
             obj_ref = json.loads(jsonp(temp_obj))
