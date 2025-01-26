@@ -17,12 +17,22 @@ class Translator(ast.NodeTransformer):
         header_code = f"""
 import os, sys
 sys.path.append(\"{include_path}\")
-from bugbeeinclude import Bugbee_build, Bugbee_complete 
+from bugbeeinclude import Bugbee_build, Bugbee_complete, Bugbee_execLambda 
         """
         header_ast = ast.parse(header_code)
         # from __future__ imports must occur at the beginning of the file
-        if isinstance(module_node.body[0], ast.Import) or isinstance(module_node.body[0], ast.ImportFrom):
-            module_node.body = module_node.body[0:1] + header_ast.body + module_node.body[1:]
+        if len(module_node.body) == 1:
+            if isinstance(module_node.body[0], ast.Import) or isinstance(module_node.body[0], ast.ImportFrom):
+                module_node.body = module_node.body[0:1] + header_ast.body + module_node.body[1:]
+            else:
+                module_node.body[:0] = header_ast.body
+        if len(module_node.body) > 1:
+            if isinstance(module_node.body[0], ast.Import) or isinstance(module_node.body[0], ast.ImportFrom):
+                module_node.body = module_node.body[0:1] + header_ast.body + module_node.body[1:]
+            elif isinstance(module_node.body[1], ast.Import) or isinstance(module_node.body[1], ast.ImportFrom):
+                module_node.body = module_node.body[0:2] + header_ast.body + module_node.body[2:]
+            else:
+                module_node.body[:0] = header_ast.body
         else:
             module_node.body[:0] = header_ast.body
 
@@ -49,21 +59,20 @@ return return_val
 
     def visit_ClassDef(self, node):
         for child_node in node.body:
-            if isinstance(child_node, ast.FunctionDef) or \
-                    isinstance(child_node, ast.AsyncFunctionDef):
+            if isinstance(child_node, ast.FunctionDef) or isinstance(child_node, ast.AsyncFunctionDef):
                 if len(child_node.decorator_list) == 0:
                     child_node.is_method = True
                 else:
                     for decorator in child_node.decorator_list:
-                        if decorator.id == 'staticmethod':
-                            child_node.is_method = False
-                            break
+                        if isinstance(decorator, ast.Name):
+                            if decorator.id == 'staticmethod':
+                                child_node.is_method = False
+                                break
         self.generic_visit(node)
         return node
 
     def visit_FunctionDef(self, node):
-        cleaned_src = black.format_str(ast.unparse(node), \
-                mode=black.FileMode())
+        cleaned_src = black.format_str(ast.unparse(node), mode=black.FileMode())
         func_id = f"{self.curr_file_path}@line{node.lineno}/\
 {funcstack.FUNC}@{node.name},\
 {hashlib.sha256(cleaned_src.encode('utf-8')).hexdigest()}"
@@ -73,7 +82,7 @@ return return_val
         self.generic_visit(node)
         inner_func_node = copy.deepcopy(node)
         inner_func_node.name = f"Bugbee_{node.name}"
-
+        inner_func_node.decorator_list = []
         # Insert the inner function definition at the beginning
         node.body = [inner_func_node]
         code_block = self.generate_code_block(inner_func_node, func_id)
@@ -89,8 +98,7 @@ return return_val
         return node
 
     def visit_AsyncFunctionDef(self, node):
-        cleaned_src = black.format_str(ast.unparse(node), \
-                mode=black.FileMode())
+        cleaned_src = black.format_str(ast.unparse(node), mode=black.FileMode())
         func_id = f"{self.curr_file_path}@line{node.lineno}/\
 {funcstack.ASYNCFUNC}@{node.name},\
 {hashlib.sha256(cleaned_src.encode('utf-8')).hexdigest()}"
@@ -101,7 +109,7 @@ return return_val
 
         inner_func_node = copy.deepcopy(node)
         inner_func_node.name = f"Bugbee_{node.name}"
-
+        inner_func_node.decorator_list = []
         # Insert the inner function definition at the beginning
         node.body = [inner_func_node]
         code_block = self.generate_code_block(inner_func_node, func_id)
@@ -116,8 +124,7 @@ return return_val
         return node
 
     def visit_Lambda(self, node):
-        cleaned_src = black.format_str(ast.unparse(node), \
-                mode=black.FileMode())
+        cleaned_src = black.format_str(ast.unparse(node), mode=black.FileMode())
         func_id = f"{self.curr_file_path}@line{node.lineno}/\
 {funcstack.LAMBDA},{hashlib.sha256(cleaned_src.encode('utf-8')).hexdigest()}"
         self.func_code[func_id] = cleaned_src
@@ -136,15 +143,17 @@ return return_val
         self.curr_file_path = file_path
         with open(file_path, "r") as src:
             src_code = src.read()
+        try:
+            tree = ast.parse(src_code)
+            modified_tree = self.visit(tree)
+            self.add_header(modified_tree)
+            modified_code = black.format_str(ast.unparse(modified_tree), mode=black.FileMode())
 
-        tree = ast.parse(src_code)
-        modified_tree = self.visit(tree)
-        self.add_header(modified_tree)
-        modified_code = black.format_str(ast.unparse(modified_tree), mode=black.FileMode())
-
-        # TODO
-        with open(file_path, "w") as f:
-            f.write(modified_code)
+            # TODO
+            with open(file_path, "w") as f:
+                f.write(modified_code)
+        except SyntaxError:
+            pass
 
     def translate_folder(self, folder_path):
         ignored_folders = ['.git', 'env']
@@ -163,4 +172,4 @@ return return_val
 
 if __name__ == "__main__":
     t = Translator("")
-    t.translate_folder("/Users/eduardo/Desktop/youtube-dl")
+    t.translate_folder("/Users/eduardo/Desktop/BugsInPy/framework/bin/temp/tornado/")

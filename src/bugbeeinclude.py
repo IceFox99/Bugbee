@@ -1,10 +1,11 @@
-from utils import to_json
+from utils2 import to_json
 import os
 from funcstack import FuncID, FuncStack, FuncStackEncoder
 import atexit
 import copy
 import json
-
+import sys
+sys.setrecursionlimit(10000)
 
 def Bugbee_build(func_id, args, kwargs):
     global __curr_func_stack__
@@ -12,8 +13,7 @@ def Bugbee_build(func_id, args, kwargs):
     pre_run_args.extend(args)
     if kwargs != {}:
         pre_run_args.extend(kwargs)
-    new_func_stack = FuncStack(func_id, __curr_func_stack__, \
-            to_json(pre_run_args))
+    new_func_stack = FuncStack(func_id, __curr_func_stack__, to_json(pre_run_args))
     __curr_func_stack__.callee.append(new_func_stack)
     __curr_func_stack__ = new_func_stack
 
