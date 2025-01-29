@@ -92,8 +92,7 @@ def remove_circ(obj, visited=None):
     if isinstance(obj, list):
         for i in range(len(obj)):
             if not has_circ(obj[i], visited):
-                result.append(obj[i])  ###??????是否需要visited
-
+                result.append(obj[i])
             else:
                 result.append(remove_circ(obj[i], visited))
     elif isinstance(obj, tuple):
@@ -137,11 +136,11 @@ def to_json(obj):
         obj_ref = {}
         if jsonp(temp_obj) != 'null':
             obj_ref = json.loads(jsonp(temp_obj))
-        obj_ref = obj_ref # | {'$SourceCode$': get_code(obj)} | (vars(temp_obj) if hasattr(temp_obj, '__dict__') else {})
+        obj_ref = obj_ref | {'$SourceCode$': get_code(obj)} | to_json(vars(temp_obj) if hasattr(temp_obj, '__dict__') else {})
     else:
         if hasattr(temp_obj, '__dict__'):
-            obj_ref = {}
-            # obj_ref = to_json(vars(temp_obj))
+            # obj_ref = {}
+            obj_ref = to_json(vars(temp_obj))
             # obj_ref = to_json(vars(temp_obj))
         else:
             obj_ref = json.loads(jsonp(temp_obj))

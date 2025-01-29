@@ -30,16 +30,25 @@
 
 
 
-class A:
-    a = []
+# class A:
+#     a = []
+#
+#     def foo(self):
+#
+#         def bar(b=self.a):
+#
+#             print(b)
+#
+#         bar()
+#
+# A().foo()
 
-    def foo(self):
-
-        def bar(b=self.a):
-
-            print(b)
-
-        bar()
-
-A().foo()
-
+import jsonpickle
+a = b"fds"
+print(type(a))
+b = jsonpickle.dumps(a)
+print(b)
+import json
+with open("/Users/eduardo/Desktop/bugfox-py/Bugbee/examples/trace.json") as f:
+    a = json.load(f)
+print(a)
