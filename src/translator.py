@@ -4,6 +4,7 @@ import copy
 import black
 import os, sys
 import hashlib
+import json
 
 
 class Translator(ast.NodeTransformer):
@@ -169,7 +170,11 @@ return return_val
                         print(file_path)
                         self.translate(file_path)
 
+        with open(os.path.abspath(os.path.join(os.path.dirname(__file__), '../examples/youtube-dl-41-buggy-src.json')), 'w') \
+                as src_file:
+            json.dump(self.func_code, src_file)
+
 
 if __name__ == "__main__":
     t = Translator("")
-    t.translate_folder("/Users/eduardo/Desktop/BugsInPy/framework/bin/temp/tornado/")
+    t.translate_folder("/Users/eduardo/Desktop/BugsInPy/framework/bin/temp/base-version/youtube-dl-41")

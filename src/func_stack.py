@@ -29,7 +29,7 @@ class FuncID:
         return True
 
     def to_str(self):
-        return self.file_path + "#" + self.func_name + "," + self.func_hash
+        return self.file_path + "/" + self.func_name + "," + self.func_hash
 
 
 class FuncStack:

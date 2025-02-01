@@ -43,12 +43,49 @@
 #
 # A().foo()
 
+# import jsonpickle
+# a = b"fds"
+# print(type(a))
+# b = jsonpickle.dumps(a)
+# print(b)
+# import json
+# with open("/Users/eduardo/Desktop/bugfox-py/Bugbee/examples/trace.json") as f:
+#     a = json.load(f)
+# print(a)
+
+
+# def gene():
+#     for i in range(10):
+#         yield i
+
+# def fun_generator():
+#     yield "Hello world!!"
+#     yield "hello"
+#
+#
+# obj = fun_generator()
+#
+# print(type(obj))
+#
+# print(next(obj))
+# print(next(obj))
 import jsonpickle
-a = b"fds"
-print(type(a))
-b = jsonpickle.dumps(a)
-print(b)
 import json
-with open("/Users/eduardo/Desktop/bugfox-py/Bugbee/examples/trace.json") as f:
-    a = json.load(f)
-print(a)
+
+# print(next(a))
+# print(next(a))
+# b = jsonpickle.dumps(a)
+# print(next(a))
+# print(next(a))
+
+
+def gene():
+    for i in range(10):
+        yield i
+
+
+a = gene()
+print(next(a))
+print(next(a))
+# import copy
+# copy.deepcopy(a)

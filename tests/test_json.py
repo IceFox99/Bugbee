@@ -47,3 +47,4 @@ def foo():
     pass
 
 print(utils2.to_json(foo))
+print(next(foo()))
