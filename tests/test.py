@@ -71,7 +71,7 @@
 # print(next(obj))
 import jsonpickle
 import json
-
+import dill
 # print(next(a))
 # print(next(a))
 # b = jsonpickle.dumps(a)
@@ -79,13 +79,29 @@ import json
 # print(next(a))
 
 
-def gene():
-    for i in range(10):
+# def gene():
+#     for i in range(10):
+#         yield i
+#
+#
+# a = gene()
+# print(next(a))
+# print(next(a))
+# # import copy
+# # copy.deepcopy(a)
+
+
+import dill
+
+def my_generator():
+    for i in range(3):
         yield i
 
+gen = my_generator()
 
-a = gene()
-print(next(a))
-print(next(a))
-# import copy
-# copy.deepcopy(a)
+# Serialize generator
+serialized = dill.dumps(gen)
+
+# Deserialize and continue execution
+deserialized_gen = dill.loads(serialized)
+print(list(deserialized_gen))  # Output: [0, 1, 2]
